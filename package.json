@@ -1,0 +1,43 @@
+{
+  "name": "commentsdb",
+  "version": "1.0.0",
+  "description": "a simple comments database for node.js",
+  "main": "index.js",
+  "scripts": {
+    "db": "rethinkdb",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arve0/commentsdb.git"
+  },
+  "keywords": [
+    "comments",
+    "db",
+    "database",
+    "rethinkdb"
+  ],
+  "author": "Arve Seljebu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/arve0/commentsdb/issues"
+  },
+  "homepage": "https://github.com/arve0/commentsdb#readme",
+  "dependencies": {
+    "is-my-json-valid": "^2.13.1",
+    "koa": "^1.2.0",
+    "koa-bodyparser": "^2.2.0",
+    "koa-router": "^5.4.0",
+    "rethinkdb": "^2.3.2",
+    "sha1": "^1.1.1"
+  },
+  "config": {
+    "database": "commentsdb",
+    "tables": {
+      "authors": "authors",
+      "comments": "comments"
+    },
+    "secrets": "EDIT_ME, ANOTHER_KEY"
+  }
+}
