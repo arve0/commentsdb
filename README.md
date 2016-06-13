@@ -6,7 +6,6 @@ See `config` in [package.json](package.json).
 
 ## Start server
 ```sh
-rethinkdb &
 npm start
 ```
 
@@ -27,8 +26,8 @@ Register name in the authors table. `captcha` must be correct and `name` must be
 **POST-data**: `captcha`, `name`
 
 **Responses**:
-- **401**: Wrong or missing captcha.
-- **400**: Name missing or schema not validated. See [schema.js](schema.js).
+- **400**: Schema not validated. See [schema.js](schema.js).
+- **401**: Wrong captcha.
 - **409**: Name taken.
 - **200**: Success. Sets a cookie with `author=id`.
 

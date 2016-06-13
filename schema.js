@@ -19,6 +19,7 @@ const authorSchema = {
   required: true,
   type: 'object',
   properties: {
+    captcha: { type: 'string', required: true },
     name: { type: 'string', required: true, minLength: 1 }
   },
   additionalProperties: false

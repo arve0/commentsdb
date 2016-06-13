@@ -33,6 +33,7 @@ app.use(parseBody());
 app.use(router.routes());
 app.use(router.allowedMethods())
 app.listen(3000);
+console.log('Listening on port 3000');
 
 function * time (next) {
   let start = Date.now();
@@ -48,24 +49,24 @@ function * dbConnection (next) {
 }
 
 function * register () {
-  // check captcha
-  let answer = this.request.body.captcha;
-  if (!answer || !captcha.correctAnswer(answer)) {
-    this.status = 401;
-    return;
-  }
-  // validate: { name: "Per" }
-  let author = schema.validAuthor(this.request.body);
-  if (!author) {
+  // validate body
+  let body = schema.validAuthor(this.request.body);
+  if (!body) {
     this.status = 400;
     return;
   }
-  let existingAuthor = yield getAuthor(author, this.dbConnection);
+  // check captcha
+  if (!captcha.correctAnswer(body.captcha)) {
+    this.status = 401;
+    return;
+  }
+  delete body.captcha;  // TODO: schema filter instead?
+  let existingAuthor = yield getAuthor(body, this.dbConnection);
   if (existingAuthor) {
     this.status = 409;
     return;
   }
-  let authorId = yield insertAuthor(author, this.dbConnection);
+  let authorId = yield insertAuthor(body, this.dbConnection);
   this.cookies.set('author', authorId, { signed: true });
   this.status = 200;
 }
@@ -74,7 +75,7 @@ function * getComments () {
   this.body = yield selectors.getComments(this.params.page, this.dbConnection);
 }
 
-function * postComment (next) {
+function * postComment () {
   // is author cookie set?
   let authorId = this.cookies.get('author', { signed: true });
   if (!authorId) {
@@ -88,10 +89,12 @@ function * postComment (next) {
     this.status = 403;
     return;
   }
-  this.request.body.author = authorId;
-  // make sure paragraph is integer
-  this.request.body.paragraph = parseInt(this.request.body.paragraph, 10);
-  let comment = schema.validComment(this.request.body);
+  let comment = Object.assign({}, this.request.body, {
+    author: authorId,
+    // make sure paragraph is integer
+    paragraph: parseInt(this.request.body.paragraph, 10)
+  });
+  comment = schema.validComment(comment);
   if (!comment) {
     this.status = 400;
     return;
