@@ -9,6 +9,14 @@ See `config` in [package.json](package.json).
 npm start
 ```
 
+## TODO
+- write client
+- report errors
+  - email?
+- multiple captchas
+  - via package.json?
+  - cookie?
+
 ## API
 
 ### GET `/captcha`
@@ -36,7 +44,13 @@ Register name in the authors table. `captcha` must be correct and `name` must be
 Get all comments for given page.
 
 **Responses**:
-- **200**: Array with comments.
+- **200**:
+
+  ```json
+  { "page": "page.html",
+    "comments": [ {...}, ... ]
+  }
+  ```
 
 
 ### POST `/comment`

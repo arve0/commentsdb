@@ -4,7 +4,7 @@
   "description": "a simple comments database for node.js",
   "main": "index.js",
   "scripts": {
-    "db": "node db.js",
+    "db": "rethinkdb",
     "server": "nodemon index.js",
     "start": "npm run db & npm run server",
     "test": "ava"
@@ -30,6 +30,7 @@
     "koa": "^1.2.0",
     "koa-bodyparser": "^2.2.0",
     "koa-router": "^5.4.0",
+    "moment": "^2.13.0",
     "rethinkdb": "^2.3.2",
     "sha1": "^1.1.1"
   },

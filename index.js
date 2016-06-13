@@ -8,6 +8,7 @@ const selectors = require('./selectors');
 const getAuthor = selectors.getAuthor;
 const insertAuthor = selectors.insertAuthor;
 const config = require('./package.json').config;
+const moment = require('moment');
 
 /**
  * Signed cookies.
@@ -50,7 +51,7 @@ function * dbConnection (next) {
 
 function * register () {
   // validate body
-  let body = schema.validAuthor(this.request.body);
+  let body = schema.postAuthor(this.request.body);
   if (!body) {
     this.status = 400;
     return;
@@ -60,19 +61,22 @@ function * register () {
     this.status = 401;
     return;
   }
-  delete body.captcha;  // TODO: schema filter instead?
-  let existingAuthor = yield getAuthor(body, this.dbConnection);
+  let author = schema.validAuthor(body);
+  let existingAuthor = yield getAuthor(author, this.dbConnection);
   if (existingAuthor) {
     this.status = 409;
     return;
   }
-  let authorId = yield insertAuthor(body, this.dbConnection);
+  let authorId = yield insertAuthor(author, this.dbConnection);
   this.cookies.set('author', authorId, { signed: true });
   this.status = 200;
 }
 
 function * getComments () {
-  this.body = yield selectors.getComments(this.params.page, this.dbConnection);
+  this.body = {
+    page: this.params.page,
+    comments: yield selectors.getComments(this.params.page, this.dbConnection)
+  };
 }
 
 function * postComment () {
@@ -92,7 +96,8 @@ function * postComment () {
   let comment = Object.assign({}, this.request.body, {
     author: authorId,
     // make sure paragraph is integer
-    paragraph: parseInt(this.request.body.paragraph, 10)
+    paragraph: parseInt(this.request.body.paragraph, 10),
+    date: moment().toISOString()
   });
   comment = schema.validComment(comment);
   if (!comment) {

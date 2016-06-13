@@ -15,11 +15,21 @@ const curryFilterAndValid = (schema) => (obj) => {
   return valid(filtered) ? filtered : false;
 }
 
-const authorSchema = {
+const postAuthor = {
   required: true,
   type: 'object',
   properties: {
     captcha: { type: 'string', required: true },
+    name: { type: 'string', required: true, minLength: 1 }
+  },
+  additionalProperties: false
+};
+exports.postAuthor = curryFilterAndValid(postAuthor);
+
+const authorSchema = {
+  required: true,
+  type: 'object',
+  properties: {
     name: { type: 'string', required: true, minLength: 1 }
   },
   additionalProperties: false
@@ -36,7 +46,8 @@ const commentSchema = {
     page: { type: 'string', required: true },
     paragraph: { type: 'integer', required: true, minimum: 0 },
     // the comment
-    comment: { type: 'string', required: true, minLength: 1 }
+    comment: { type: 'string', required: true, minLength: 1 },
+    date: { type: 'string', required: true, format: 'date-time' }
   },
   additionalProperties: false
 }

@@ -6,11 +6,24 @@ const r = require('rethinkdb');
 
 let db, server;
 test.cb.before((t) => {
-  console.log('---- STARTING SERVERS ----');
-  db = child.spawn('rethinkdb', [], { cwd: __dirname, stdio: 'inherit' });
-  server = child.fork('index.js', [], { cwd: __dirname, stdio: 'inherit' });
-  // wait for processes to start
-  setTimeout(t.end, 3000);
+  let timeout = 0;
+  if (child.spawnSync('pgrep', ['-lf', 'rethinkdb']).status === 1) {
+    console.log('---- STARTING DATABASE ----');
+    db = child.spawn('rethinkdb', [], { cwd: __dirname, stdio: 'inherit' });
+    timeout += 3000;
+  }
+  if (child.spawnSync('pgrep', ['-lf', 'node .* index.js']).status === 1) {
+    console.log('---- STARTING SERVER ----');
+    server = child.fork('index.js', [], { cwd: __dirname, stdio: 'inherit' });
+    timeout += 100;
+  }
+  // wait for server to start
+  function wait () {
+    request(HOST + 'captcha')
+      .then(() => t.end())
+      .catch(wait);
+  }
+  setTimeout(wait, timeout);
 });
 
 const HOST = 'http://localhost:3000/';
@@ -23,7 +36,7 @@ test('GET /captcha -> 200 question', t =>
     }));
 
 // make sure mingling with datatypes does not throw serverside
-test.serial('POST /register JSON and captcha `true` -> !500', t =>
+test('POST /register JSON and captcha `true` -> !500', t =>
   request({
     uri: HOST + 'register',
     method: 'POST',
@@ -92,14 +105,19 @@ test.serial('GET /comments -> 200', t =>
     uri: HOST + 'comments/test.html',
     json: true
   }).then((result) => {
-    t.true(Array.isArray(result));
-    t.true(result.length === 1);
+    t.true(Array.isArray(result.comments));
+    t.true(result.comments.length === 1);
   }).then(() => deleteComments({ page: 'test.html' })));
 
 test.after.always((t) => {
-  console.log('---- STOPPING SERVERS ----');
-  server.kill('SIGKILL');
-  db.kill('SIGINT');
+  if (server) {
+    console.log('---- STOPPING SERVER ----');
+    server.kill('SIGKILL');
+  }
+  if (db) {
+    console.log('---- STOPPING DATABASE ----');
+    db.kill('SIGINT');
+  }
 });
 
 function deleteAuthor (filter) {
