@@ -1,3 +1,4 @@
+'use strict';
 const r = require('rethinkdb');
 const app = require('koa')();
 const router = require('koa-router')();

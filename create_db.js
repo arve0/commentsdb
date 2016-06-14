@@ -1,3 +1,4 @@
+'use strict';
 const r = require('rethinkdb');
 const config = require('./package.json').config;
 
