@@ -12,7 +12,7 @@ test.cb.before((t) => {
     db = child.spawn('rethinkdb', [], { cwd: __dirname, stdio: 'inherit' });
     timeout += 3000;
   }
-  if (child.spawnSync('pgrep', ['-lf', 'node .* index.js']).status === 1) {
+  if (child.spawnSync('pgrep', ['-lf', '(node|nodemon) index.js']).status === 1) {
     console.log('---- STARTING SERVER ----');
     server = child.fork('index.js', [], { cwd: __dirname, stdio: 'inherit' });
     timeout += 100;
@@ -77,7 +77,7 @@ test.serial('POST /comment -> 200', t =>
   request({
     uri: HOST + 'comment',
     method: 'POST',
-    form: { page: 'test.html', paragraph: 2, comment: 'hello' },
+    form: { page: 'test.html', paragraph: 2, hash: 3, comment: 'hello' },
     jar: true  // use cookie from jar
   }));
 

@@ -96,8 +96,9 @@ function * postComment () {
   }
   let comment = Object.assign({}, this.request.body, {
     author: authorId,
-    // make sure paragraph is integer
+    // make sure paragraph and hash is integer
     paragraph: parseInt(this.request.body.paragraph, 10),
+    hash: parseInt(this.request.body.hash, 10),
     date: moment().toISOString()
   });
   comment = schema.validComment(comment);

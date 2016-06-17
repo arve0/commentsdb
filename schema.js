@@ -45,6 +45,7 @@ const commentSchema = {
     // path to page, /scratch/index.html
     page: { type: 'string', required: true },
     paragraph: { type: 'integer', required: true, minimum: 0 },
+    hash: {type: 'integer', required: true },
     // the comment
     comment: { type: 'string', required: true, minLength: 1 },
     date: { type: 'string', required: true, format: 'date-time' }

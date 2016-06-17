@@ -56,7 +56,7 @@ Get all comments for given page.
 ### POST `/comment`
 Store comment.
 
-**POST-data:** `page`, `paragraph` and `comment`.
+**POST-data:** `page`, `paragraph`, `hash` and `comment`.
 
 Example:
 ```sh
