@@ -30,6 +30,7 @@ router.post('/comment', postComment);
  * Middlewares.
  */
 app.use(time);
+app.use(cors);
 app.use(dbConnection);
 app.use(parseBody());
 app.use(router.routes());
@@ -41,6 +42,12 @@ function * time (next) {
   let start = Date.now();
   yield next;
   this.set('X-Response-Time', Date.now() - start);
+}
+
+function * cors (next) {
+  this.set('Access-Control-Allow-Origin', this.get('Origin') || '*');
+  this.set('Access-Control-Allow-Credentials', 'true');
+  yield next;
 }
 
 function * dbConnection (next) {
