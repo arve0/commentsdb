@@ -24,6 +24,7 @@ exports.insertAuthor = (author, connection) =>
 exports.getComments = (page, connection) =>
   r.table(config.tables.comments)
     .filter({ page })
+    .orderBy('date')
     .run(connection)
     .then(cursor => cursor.toArray());
     // TODO: join authors
