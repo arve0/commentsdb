@@ -25,9 +25,15 @@ exports.getComments = (page, connection) =>
   r.table(config.tables.comments)
     .filter({ page })
     .orderBy('date')
+    .eqJoin('author', r.table(config.tables.authors))
+    // right (author) -> right.author only
+    .map((doc) => ({
+      left: doc('left'),
+      right: { author: doc('right')('name') }
+    }))
+    .zip()
     .run(connection)
     .then(cursor => cursor.toArray());
-    // TODO: join authors
 
 exports.insertComment = (comment, connection) =>
   r.table(config.tables.comments)
